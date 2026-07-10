@@ -1,5 +1,6 @@
 VERSION=0.0.8
-LDFLAGS=-ldflags "-w -s -X main.version=${VERSION}"
+GITCOMMIT?=$(shell git describe --dirty --always 2>/dev/null)
+LDFLAGS=-ldflags "-w -s -X main.version=${VERSION} -X main.commit=${GITCOMMIT}"
 
 all: mackerel-plugin-pinging
 
@@ -13,11 +14,3 @@ linux: main.go
 
 check:
 	go test ./...
-
-fmt:
-	go fmt ./...
-
-tag:
-	git tag v${VERSION}
-	git push origin v${VERSION}
-	git push origin master

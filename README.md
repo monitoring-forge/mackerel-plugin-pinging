@@ -9,7 +9,7 @@ Usage:
   mackerel-plugin-pinging [OPTIONS]
 
 Application Options:
-      --host=       Hostname to ping
+      --host=       Target IP Address to ping
       --timeout=    timeout millisec per ping (default: 1000)
       --interval=   sleep millisec after every ping (default: 10)
       --count=      Count Sending ping (default: 10)
@@ -20,9 +20,12 @@ Help Options:
   -h, --help        Show this help message
 ```
 
-Sample
+Notice: Root privileges are required to use this plugin.
+
+## Sample
 
 ```
+$ sudo mackerel-plugin-pinging --host 8.8.8.8 --key-prefix googledns
 pinging.googledns_rtt_count.success     10.000000       1556117540
 pinging.googledns_rtt_count.error       0.000000        1556117540
 pinging.googledns_rtt_ms.max    11.853529       1556117540

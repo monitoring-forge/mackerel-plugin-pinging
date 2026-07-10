@@ -23,7 +23,7 @@ _testmain.go
 *.test
 *.prof
 
-mackerel-plugin-pinging
+/mackerel-plugin-pinging
 vendor/
 dist/
 *~
