@@ -96,19 +96,19 @@ func (opt *Opt) run() error {
 	if len(rtts) > 0 {
 		mean, err := stats.Mean(rtts)
 		if err != nil {
-			log.Printf("error in calcurating average: %v", err)
+			log.Printf("error in calculating average: %v", err)
 		}
 		min, err := stats.Min(rtts)
 		if err != nil {
-			log.Printf("error in calcurating min: %v", err)
+			log.Printf("error in calculating min: %v", err)
 		}
 		max, err := stats.Max(rtts)
 		if err != nil {
-			log.Printf("error in calcurating max: %v", err)
+			log.Printf("error in calculating max: %v", err)
 		}
 		percentile90, err := stats.Percentile(rtts, 90)
 		if err != nil {
-			log.Printf("error in calcurating 90th percentile: %v", err)
+			log.Printf("error in calculating 90th percentile: %v", err)
 		}
 
 		fmt.Printf("pinging.%s_rtt_ms.max\t%f\t%d\n", opt.KeyPrefix, max, now)
