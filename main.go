@@ -3,23 +3,23 @@ package main
 import (
 	"fmt"
 	"log"
-	"math"
 	"net"
 	"os"
+	"path/filepath"
 	"runtime"
-	"sort"
 	"strings"
 	"time"
 
 	ping "github.com/digineo/go-ping"
 	flags "github.com/jessevdk/go-flags"
+	"github.com/montanaflynn/stats"
 )
 
-// version by Makefile
 var version string
+var commit string
 
-type cmdOpts struct {
-	Host      string `long:"host" description:"Hostname to ping" required:"true"`
+type Opt struct {
+	Host      string `long:"host" description:"Target IP address to ping" required:"true"`
 	Timeout   int    `long:"timeout" default:"1000" description:"timeout millisec per ping"`
 	Interval  int    `long:"interval" default:"10" description:"sleep millisec after every ping"`
 	Count     int    `long:"count" default:"10" description:"Count Sending ping"`
@@ -27,15 +27,11 @@ type cmdOpts struct {
 	Version   bool   `short:"v" long:"version" description:"Show version"`
 }
 
-func round(f float64) int64 {
-	return int64(math.Round(f)) - 1
-}
-
-func resolveHost(Host string) (*net.IPAddr, *ping.Pinger, error) {
+func resolveIPAddrAndPinger(addr string) (*net.IPAddr, *ping.Pinger, error) {
 	var ra *net.IPAddr
 	var pinger *ping.Pinger
-	if strings.Index(Host, ":") != -1 {
-		r, err := net.ResolveIPAddr("ip6", Host)
+	if strings.Index(addr, ":") != -1 {
+		r, err := net.ResolveIPAddr("ip6", addr)
 		if err != nil {
 			return ra, pinger, err
 		}
@@ -46,7 +42,7 @@ func resolveHost(Host string) (*net.IPAddr, *ping.Pinger, error) {
 		}
 		pinger = p
 	} else {
-		r, err := net.ResolveIPAddr("ip4", Host)
+		r, err := net.ResolveIPAddr("ip4", addr)
 		if err != nil {
 			return ra, pinger, err
 		}
@@ -60,49 +56,65 @@ func resolveHost(Host string) (*net.IPAddr, *ping.Pinger, error) {
 	return ra, pinger, nil
 }
 
-func getStats(opts cmdOpts) error {
-	ra, pinger, err := resolveHost(opts.Host)
+func (opt *Opt) run() error {
+	ra, pinger, err := resolveIPAddrAndPinger(opt.Host)
+
 	if err != nil {
 		errorNow := uint64(time.Now().Unix())
-		fmt.Printf("pinging.%s_rtt_count.success\t%f\t%d\n", opts.KeyPrefix, 0.0, errorNow)
-		fmt.Printf("pinging.%s_rtt_count.error\t%f\t%d\n", opts.KeyPrefix, float64(opts.Count), errorNow)
+		fmt.Printf("pinging.%s_rtt_count.success\t%f\t%d\n", opt.KeyPrefix, 0.0, errorNow)
+		fmt.Printf("pinging.%s_rtt_count.error\t%f\t%d\n", opt.KeyPrefix, float64(opt.Count), errorNow)
 		return err
 	}
 	defer pinger.Close()
 
-	var rtts sort.Float64Slice
-	var t float64
-	s := float64(0)
-	e := float64(0)
+	rtts := []float64{}
+	succeeded := float64(0)
+	failed := float64(0)
 
 	// preflight
-	_, err = pinger.Ping(ra, time.Millisecond*time.Duration(opts.Timeout))
+	_, err = pinger.Ping(ra, time.Millisecond*time.Duration(opt.Timeout))
 	if err != nil {
 		log.Printf("error in preflight: %v", err)
 	}
 
-	for i := 0; i < opts.Count; i++ {
-		time.Sleep(time.Millisecond * time.Duration(opts.Interval))
-		rtt, err := pinger.Ping(ra, time.Millisecond*time.Duration(opts.Timeout))
+	for i := 0; i < opt.Count; i++ {
+		time.Sleep(time.Millisecond * time.Duration(opt.Interval))
+		rtt, err := pinger.Ping(ra, time.Millisecond*time.Duration(opt.Timeout))
 		if err != nil {
 			log.Printf("%v", err)
-			e++
+			failed++
 			continue
 		}
 		rttMilliSec := float64(rtt.Nanoseconds()) / 1000.0 / 1000.0
 		rtts = append(rtts, rttMilliSec)
-		t += rttMilliSec
-		s++
+		succeeded++
 	}
-	sort.Sort(rtts)
+
 	now := uint64(time.Now().Unix())
-	fmt.Printf("pinging.%s_rtt_count.success\t%f\t%d\n", opts.KeyPrefix, s, now)
-	fmt.Printf("pinging.%s_rtt_count.error\t%f\t%d\n", opts.KeyPrefix, e, now)
-	if s > 0 {
-		fmt.Printf("pinging.%s_rtt_ms.max\t%f\t%d\n", opts.KeyPrefix, rtts[round(s)], now)
-		fmt.Printf("pinging.%s_rtt_ms.min\t%f\t%d\n", opts.KeyPrefix, rtts[0], now)
-		fmt.Printf("pinging.%s_rtt_ms.average\t%f\t%d\n", opts.KeyPrefix, t/s, now)
-		fmt.Printf("pinging.%s_rtt_ms.90_percentile\t%f\t%d\n", opts.KeyPrefix, rtts[round(s*0.90)], now)
+	fmt.Printf("pinging.%s_rtt_count.success\t%f\t%d\n", opt.KeyPrefix, succeeded, now)
+	fmt.Printf("pinging.%s_rtt_count.error\t%f\t%d\n", opt.KeyPrefix, failed, now)
+	if len(rtts) > 0 {
+		mean, err := stats.Mean(rtts)
+		if err != nil {
+			log.Printf("error in calculating average: %v", err)
+		}
+		min, err := stats.Min(rtts)
+		if err != nil {
+			log.Printf("error in calculating min: %v", err)
+		}
+		max, err := stats.Max(rtts)
+		if err != nil {
+			log.Printf("error in calculating max: %v", err)
+		}
+		percentile90, err := stats.Percentile(rtts, 90)
+		if err != nil {
+			log.Printf("error in calculating 90th percentile: %v", err)
+		}
+
+		fmt.Printf("pinging.%s_rtt_ms.max\t%f\t%d\n", opt.KeyPrefix, max, now)
+		fmt.Printf("pinging.%s_rtt_ms.min\t%f\t%d\n", opt.KeyPrefix, min, now)
+		fmt.Printf("pinging.%s_rtt_ms.average\t%f\t%d\n", opt.KeyPrefix, mean, now)
+		fmt.Printf("pinging.%s_rtt_ms.90_percentile\t%f\t%d\n", opt.KeyPrefix, percentile90, now)
 	}
 	return nil
 }
@@ -112,26 +124,32 @@ func main() {
 }
 
 func _main() int {
-	opts := cmdOpts{}
-	psr := flags.NewParser(&opts, flags.Default)
+	opt := &Opt{}
+	psr := flags.NewParser(opt, flags.HelpFlag|flags.PassDoubleDash)
 	_, err := psr.Parse()
 
-	if opts.Version {
-		fmt.Printf(`%s %s
-Compiler: %s %s
-`,
-			os.Args[0],
+	if opt.Version {
+		if commit == "" {
+			commit = "dev"
+		}
+		fmt.Printf(
+			"%s-%s\n%s/%s, %s, %s\n",
+			filepath.Base(os.Args[0]),
 			version,
-			runtime.Compiler,
-			runtime.Version())
+			runtime.GOOS,
+			runtime.GOARCH,
+			runtime.Version(),
+			commit)
 		return 0
 	}
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		return 1
 	}
-	err = getStats(opts)
+
+	err = opt.run()
 	if err != nil {
-		log.Printf("%v", err)
+		fmt.Fprintf(os.Stderr, "%v\n", err)
 		return 1
 	}
 	return 0
