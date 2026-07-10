@@ -1,15 +1,15 @@
 module github.com/kazeburo/mackerel-plugin-pinging
 
-go 1.18
+go 1.23.0
 
 require (
-	github.com/digineo/go-ping v1.0.1
-	github.com/jessevdk/go-flags v1.5.0
+	github.com/digineo/go-ping v1.2.0
+	github.com/jessevdk/go-flags v1.6.1
 )
 
 require (
 	github.com/digineo/go-logwrap v0.0.0-20181106161722-a178c58ea3f0 // indirect
 	github.com/montanaflynn/stats v0.9.0
-	golang.org/x/net v0.7.0 // indirect
-	golang.org/x/sys v0.5.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
 )
