@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.0.10](https://github.com/kazeburo/mackerel-plugin-pinging/compare/v0.0.9...v0.0.10) - 2026-07-11
+
+- go: bump golang.org/x/sys from 0.46.0 to 0.47.0 in the dependencies group by @dependabot[bot] in https://github.com/kazeburo/mackerel-plugin-pinging/pull/11
+
 ## [v0.0.9](https://github.com/kazeburo/mackerel-plugin-pinging/compare/v0.0.8...v0.0.9) - 2026-07-10
 
 - renew packaging to use tagpr by @kazeburo in https://github.com/kazeburo/mackerel-plugin-pinging/pull/6
