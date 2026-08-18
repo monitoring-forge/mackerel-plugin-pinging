@@ -5,7 +5,7 @@ import (
 
 	ping "github.com/digineo/go-ping"
 )
-...
+
 func resolveIPAddrAndPinger(addr string) (*net.IPAddr, *ping.Pinger, error) {
 	r, err := net.ResolveIPAddr("ip", addr)
 	if err != nil {
@@ -22,5 +22,4 @@ func resolveIPAddrAndPinger(addr string) (*net.IPAddr, *ping.Pinger, error) {
 		return r, nil, err
 	}
 	return r, pinger, nil
-}
 }
