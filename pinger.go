@@ -2,14 +2,11 @@ package main
 
 import (
 	"net"
-	"strings"
 
 	ping "github.com/digineo/go-ping"
 )
-
+...
 func resolveIPAddrAndPinger(addr string) (*net.IPAddr, *ping.Pinger, error) {
-	var ra *net.IPAddr
-	var pinger *ping.Pinger
 	r, err := net.ResolveIPAddr("ip", addr)
 	if err != nil {
 		return nil, nil, err
@@ -25,5 +22,5 @@ func resolveIPAddrAndPinger(addr string) (*net.IPAddr, *ping.Pinger, error) {
 		return r, nil, err
 	}
 	return r, pinger, nil
-	return ra, pinger, nil
+}
 }
