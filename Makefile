@@ -1,16 +1,18 @@
 VERSION=0.0.10
-GITCOMMIT?=$(shell git describe --dirty --always 2>/dev/null)
-LDFLAGS=-ldflags "-w -s -X main.version=${VERSION} -X main.commit=${GITCOMMIT}"
+LDFLAGS=-ldflags "-w -s -X main.version=${VERSION}"
 
 all: mackerel-plugin-pinging
 
-.PHONY: mackerel-plugin-pinging
+.PHONY: mackerel-plugin-pinging linux check lint
 
-mackerel-plugin-pinging: main.go
+mackerel-plugin-pinging: *.go
 	go build $(LDFLAGS) -o mackerel-plugin-pinging
 
-linux: main.go
+linux: *.go
 	GOOS=linux GOARCH=amd64 go build $(LDFLAGS) -o mackerel-plugin-pinging
 
 check:
 	go test ./...
+
+lint:
+	golangci-lint run ./...
