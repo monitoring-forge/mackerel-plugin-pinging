@@ -60,7 +60,7 @@ command = "/path/to/mackerel-plugin-pinging --host 8.8.8.8 --key-prefix google_d
 command = "/path/to/mackerel-plugin-pinging --host 1.1.1.1 --key-prefix cloudflare_dns"
 ```
 
-mackerel-gentを root権限で実行していない環境では `sudo` を使用するか、コマンドにSUIDを設定してください。
+Mackerel Agentを root権限で実行できない環境では、sudoers でこのバイナリの実行だけを許可するか、Linux では必要最小限の `CAP_NET_RAW` capability を付与してください。バイナリへの SUID 設定は、不要な root 権限を与えるため推奨しません。
 
 ## 出力メトリクス
 
