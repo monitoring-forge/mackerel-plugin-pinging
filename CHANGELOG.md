@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.0.11](https://github.com/monitoring-forge/mackerel-plugin-pinging/compare/v0.0.10...v0.0.11) - 2026-08-18
+
+- go: bump the dependencies group with 2 updates by @dependabot[bot] in https://github.com/monitoring-forge/mackerel-plugin-pinging/pull/13
+- go: bump github.com/montanaflynn/stats from 0.10.0 to 0.12.2 in the dependencies group by @dependabot[bot] in https://github.com/monitoring-forge/mackerel-plugin-pinging/pull/15
+- ci: bump the dependencies group across 1 directory with 3 updates by @dependabot[bot] in https://github.com/monitoring-forge/mackerel-plugin-pinging/pull/16
+- Sync files with `monitoring-forge/github-common` by @monitoring-forge-files-sync-action[bot] in https://github.com/monitoring-forge/mackerel-plugin-pinging/pull/17
+- Sync files with `monitoring-forge/github-common` by @monitoring-forge-files-sync-action[bot] in https://github.com/monitoring-forge/mackerel-plugin-pinging/pull/18
+- ci: bump the-pr-agent/pr-agent from 0.41.1 to 0.42.0 in the dependencies group across 1 directory by @dependabot[bot] in https://github.com/monitoring-forge/mackerel-plugin-pinging/pull/19
+- refactor: update Makefile and improve README, add pinger functionality by @kazeburo in https://github.com/monitoring-forge/mackerel-plugin-pinging/pull/20
+
 ## [v0.0.10](https://github.com/kazeburo/mackerel-plugin-pinging/compare/v0.0.9...v0.0.10) - 2026-07-11
 
 - go: bump golang.org/x/sys from 0.46.0 to 0.47.0 in the dependencies group by @dependabot[bot] in https://github.com/kazeburo/mackerel-plugin-pinging/pull/11
