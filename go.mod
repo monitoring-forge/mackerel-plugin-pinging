@@ -12,7 +12,7 @@ require (
 require (
 	github.com/digineo/go-logwrap v0.0.0-20181106161722-a178c58ea3f0 // indirect
 	github.com/monitoring-forge/flagrun v0.0.8
-	github.com/montanaflynn/stats v0.12.4
+	github.com/montanaflynn/stats v0.12.5
 	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 )
