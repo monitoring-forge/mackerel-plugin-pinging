@@ -1,4 +1,4 @@
-VERSION=0.0.11
+VERSION=0.0.12
 LDFLAGS=-ldflags "-w -s -X main.version=${VERSION}"
 
 all: mackerel-plugin-pinging
